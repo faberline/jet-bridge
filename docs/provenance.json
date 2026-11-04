@@ -1,0 +1,44 @@
+{
+  "repository": "https://github.com/faberline/jet",
+  "commit": "a584413c77fe19ced847fa4df831edf920cf025d",
+  "license": "MIT",
+  "original_source_sha256": {
+    "src/browser/cdp.rs": "f94d7ae1e7ce55b77c1a711a3fcfea6c9bedb3ab6833ed4aecde8552953df7c4",
+    "src/browser/context.rs": "08f6173c10ee870dcae3c29324e79b5b13ab981c86852e04378c2d9090c712e2",
+    "src/browser/install.rs": "5d078f1f8d6f4a56a773c6524f7b07e395db371f3fa47084a49b86faa686d57f",
+    "src/browser/launcher.rs": "600634f4796238f82f04bd96c0bcdd6d5a9cd8696809af6a812a664739adaa28",
+    "src/browser/locator.rs": "bddb1e2f5583d523397638746b4ee1f06fec883ab3a24975809d0234428628a4",
+    "src/browser/mod.rs": "29cefc0e1295e13a37de8a09d59b945bb5124fc36a5ad2fffb9f3b34aada4e81",
+    "src/browser/page.rs": "58472ac134d95e41dad1d1f264eeec2b3cf5b939f7dceec11b020221a14c85ce",
+    "src/browser_cli/interact.rs": "166a9b8331eaf7d6603bdafc8950bca860e3b0b6d8f6a4cd9e9273d44a8c48db",
+    "src/browser_cli/mcp.rs": "24497b27c8a7f981f94b572c583d246687ce210556ae20714d0eb2376ebfad42",
+    "src/browser_cli/mod.rs": "5c346ca61b7cd6b3eb6a47dd3ad66d70b3464dd2f323a4b96e910e82c26da83c",
+    "src/browser_cli/pretty.rs": "5696be6f1578ef11af4581006dbe37c421743da11295f450e7347dc48ffa978b",
+    "src/browser_cli/session.rs": "753b1134aa2338a601ee25d2c7342dd71d10ed445ea1afe2630d0041b7ecc363",
+    "src/cdp_driver/mod.rs": "c4ce177487fc1ba364b0173b371cca4f472415c1d303b4b56bd109112e83882d",
+    "src/cdp_driver/page_binding.rs": "7dbbb5885aa8e24065babc478edc7c13f57b5996b40df611c8375fa61df075d8",
+    "LICENSE": "2c04e52c0809695aaee4062e94ed17249f54d96f6c9ef0a09925640581fa913b"
+  },
+  "cli_fragments": {
+    "source": "src/cli.rs",
+    "source_sha256": "19d79420213c9e4f85e146dd42b63622c59c87ece3cf9992b93b095daf295893",
+    "parts": [
+      "browser_bridge_command",
+      "browser/bb dispatcher",
+      "numeric flag parsing helpers",
+      "original browser Command builder"
+    ]
+  },
+  "consumer_acceptance_tests": [
+    {
+      "name": "gh3737_safe_locator_agrees_with_safe_define_for_same_inputs",
+      "destination": "Jet src/bridge_consumer_tests.rs",
+      "assertions": "unchanged"
+    },
+    {
+      "name": "helper_distinct_from_dev_server_3725_and_wasm_dev_3730_warns",
+      "destination": "Jet src/bridge_consumer_tests.rs",
+      "assertions": "unchanged"
+    }
+  ]
+}
