@@ -1,3 +1,7 @@
+[workspace]
+resolver = "2"
+members = [".", "crates/protocol"]
+
 [package]
 name = "jet-bridge"
 version = "0.1.0"
@@ -7,6 +11,7 @@ repository = "https://github.com/faberline/jet-bridge"
 description = "Browser and application automation through CLI and MCP"
 
 [dependencies]
+jet-bridge-protocol = { path = "crates/protocol" }
 anyhow = "1"
 base64 = "0.22"
 clap = { version = "4", features = ["derive", "string"] }

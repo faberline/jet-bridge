@@ -47,7 +47,32 @@ The test launches its own browser and local fixture. It checks Chinese
 fill events, clicks, shared CLI/MCP state, tool errors, PNG capture and
 actual browser exit after shutdown. It uses no Playwright runtime.
 
-Two cross-module tests remain in the Jet consumer. Jet cutover, hosted CI,
-the Surface desktop connection and WASM semantic adapter are still pending.
+Two cross-module tests remain in the Jet consumer. The initial extraction
+also passes Linux CI. Jet consumer cutover and the Surface adapters are
+still being verified.
 See [the application bridge boundary](docs/application-bridge.md).
 No full Playwright replacement or native app acceptance is claimed.
+
+## Application protocol and clients
+
+`jet-bridge-protocol` is a small workspace crate. It depends only on Serde
+and JSON. A Surface app can use this crate without the browser transport,
+CLI or MCP dependencies. Requests and responses use protocol version 1.
+
+The native client reads an explicit private session file. It accepts only
+loopback addresses. The WASM client calls `window.__jet_bridge.request`
+through the existing browser connection. Both clients validate the response
+version and request ID. They do not retry submitted actions after a timeout.
+
+```sh
+jet-bridge --app-session /path/to/session.json ui snapshot
+jet-bridge --app-session /path/to/session.json ui fill name '中文橋接'
+jet-bridge --app-session /path/to/session.json mcp
+jet-bridge --root /path/to/project ui query --role TextInput
+jet-bridge --root /path/to/project mcp --ui
+```
+
+The UI MCP mode exposes seven semantic tools. The default MCP mode retains
+the 27 browser tools. These clients require an application adapter. The
+Surface adapters are a separate change; the commands above alone do not
+prove native or WASM runtime acceptance.

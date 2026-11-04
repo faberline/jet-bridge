@@ -1173,6 +1173,7 @@ dependencies = [
  "dirs",
  "futures-util",
  "image",
+ "jet-bridge-protocol",
  "reqwest",
  "serde",
  "serde_json",
@@ -1183,6 +1184,14 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "zip",
+]
+
+[[package]]
+name = "jet-bridge-protocol"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

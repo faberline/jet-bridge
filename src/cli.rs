@@ -589,9 +589,25 @@ pub fn command() -> Command {
                 .default_value(".")
                 .help("Project directory for the bridge session"),
         )
+        .arg(
+            Arg::new("app-session")
+                .long("app-session")
+                .global(true)
+                .help("Native application's private bridge session file"),
+        )
         .subcommand(bb_command())
         .subcommand(browser_command())
-        .subcommand(Command::new("mcp").about("Serve the browser bridge over MCP stdio"))
+        .subcommand(crate::application::cli::command())
+        .subcommand(
+            Command::new("mcp")
+                .about("Serve bridge tools over MCP stdio")
+                .arg(
+                    Arg::new("ui")
+                        .long("ui")
+                        .action(ArgAction::SetTrue)
+                        .help("Expose semantic UI tools for the browser's WASM application"),
+                ),
+        )
 }
 pub async fn execute(matches: &ArgMatches) -> Result<()> {
     let root = PathBuf::from(
@@ -599,10 +615,23 @@ pub async fn execute(matches: &ArgMatches) -> Result<()> {
             .get_one::<String>("root")
             .expect("root has a default"),
     );
+    let options = crate::application::Options {
+        app_session: matches.get_one::<String>("app-session").map(PathBuf::from),
+    };
     match matches.subcommand() {
+        Some(("mcp", args)) if options.app_session.is_some() || args.get_flag("ui") => {
+            crate::browser_cli::mcp::serve_application(&root, &options).await
+        }
         Some(("mcp", _)) => crate::browser_cli::mcp::serve(&root).await,
-        Some((name @ ("bb" | "browser"), args)) => run_browser(name, args, &root).await,
-        _ => anyhow::bail!("Choose browser, bb, or mcp; use --help for commands"),
+        Some(("ui", args)) => crate::application::cli::execute(&root, &options, args).await,
+        Some((name @ ("bb" | "browser"), args)) => {
+            anyhow::ensure!(
+                options.app_session.is_none(),
+                "use ui or mcp commands with --app-session"
+            );
+            run_browser(name, args, &root).await
+        }
+        _ => anyhow::bail!("Choose browser, bb, ui or mcp; use --help for commands"),
     }
 }
 

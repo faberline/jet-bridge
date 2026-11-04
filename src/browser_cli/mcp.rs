@@ -27,6 +27,20 @@ const SERVER_NAME: &str = "jet-bb";
 
 /// Run the MCP stdio server until stdin closes.
 pub async fn serve(root_dir: &Path) -> Result<()> {
+    serve_inner(root_dir, None).await
+}
+
+pub async fn serve_application(
+    root_dir: &Path,
+    options: &crate::application::Options,
+) -> Result<()> {
+    serve_inner(root_dir, Some(options)).await
+}
+
+async fn serve_inner(
+    root_dir: &Path,
+    application: Option<&crate::application::Options>,
+) -> Result<()> {
     let stdin = tokio::io::stdin();
     let mut lines = BufReader::new(stdin).lines();
     let mut stdout = tokio::io::stdout();
@@ -48,7 +62,7 @@ pub async fn serve(root_dir: &Path) -> Result<()> {
                 continue;
             }
         };
-        if let Some(resp) = handle_message(root_dir, &msg).await {
+        if let Some(resp) = handle_message_with_application(root_dir, &msg, application).await {
             write_frame(&mut stdout, &resp).await?;
         }
     }
@@ -64,7 +78,16 @@ async fn write_frame(stdout: &mut tokio::io::Stdout, msg: &Value) -> Result<()> 
 }
 
 /// Handle one JSON-RPC message. Returns `None` for notifications.
+#[cfg(test)]
 async fn handle_message(root_dir: &Path, msg: &Value) -> Option<Value> {
+    handle_message_with_application(root_dir, msg, None).await
+}
+
+async fn handle_message_with_application(
+    root_dir: &Path,
+    msg: &Value,
+    application: Option<&crate::application::Options>,
+) -> Option<Value> {
     let method = msg.get("method").and_then(Value::as_str).unwrap_or("");
     let id = msg.get("id").cloned();
 
@@ -75,9 +98,17 @@ async fn handle_message(root_dir: &Path, msg: &Value) -> Option<Value> {
     };
 
     let result = match method {
-        "initialize" => Ok(initialize_result(msg)),
+        "initialize" => {
+            let mut result = initialize_result(msg);
+            if application.is_some() {
+                result["serverInfo"]["name"] = "jet-bridge-ui".into();
+            }
+            Ok(result)
+        }
         "ping" => Ok(json!({})),
-        "tools/list" => Ok(json!({ "tools": tool_definitions() })),
+        "tools/list" => Ok(
+            json!({ "tools": if application.is_some() { crate::application::tool_definitions() } else { tool_definitions() } }),
+        ),
         "tools/call" => {
             let params = msg.get("params").cloned().unwrap_or_else(|| json!({}));
             let name = params.get("name").and_then(Value::as_str).unwrap_or("");
@@ -85,7 +116,12 @@ async fn handle_message(root_dir: &Path, msg: &Value) -> Option<Value> {
                 .get("arguments")
                 .cloned()
                 .unwrap_or_else(|| json!({}));
-            match call_tool(root_dir, name, &args).await {
+            let result = if let Some(options) = application {
+                crate::application::call_tool(root_dir, options, name, &args).await
+            } else {
+                call_tool(root_dir, name, &args).await
+            };
+            match result {
                 Ok(content) => Ok(json!({ "content": content, "isError": false })),
                 Err(err) => Ok(json!({
                     "content": [ { "type": "text", "text": format!("{err:#}") } ],
