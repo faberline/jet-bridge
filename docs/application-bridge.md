@@ -78,5 +78,6 @@ Playwright runtime. Surface imports only the protocol crate at
 The hosted Jet parity workflow reports an unwired oracle and no results.
 Its successful exit does not qualify hosted parity. Other native operating
 systems, physical OS IME candidate windows, full Playwright parity and the
-newer MCP protocol need their own runtime/conformance checks. All linked
-changes remain draft PRs.
+newer MCP protocol need their own runtime/conformance checks. Linked PRs
+identify the tested revisions. Main-branch landing is tracked by
+[issue #3](https://github.com/faberline/jet-bridge/issues/3).

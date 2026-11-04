@@ -3,6 +3,13 @@
 A standalone extraction of Jet's browser automation code.
 Source and license evidence is in `docs/provenance.json`.
 
+The current main-branch checkpoint is tracked in
+[jet-bridge@0.1.0](https://github.com/faberline/jet-bridge/milestone/1)
+and [issue #3](https://github.com/faberline/jet-bridge/issues/3).
+Hosted browser/SDK gates and transport hardening are tracked in
+[jet-bridge@0.2.0](https://github.com/faberline/jet-bridge/milestone/2).
+Milestone landing does not publish a crate or release tag.
+
 The initial library contains Chromium transport, page/locator operations,
 semantic DOM interaction, session storage, CLI helpers and an MCP server.
 It has no dependency on Jet's build tool, Core or Surface.
