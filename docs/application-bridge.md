@@ -1,8 +1,8 @@
 # Application bridge boundary
 
-The user requested desktop MCP/CLI access and WASM access through the Jet
-bridge. This document defines the next implementation slice. It is a plan,
-not evidence that the adapters below already work.
+One protocol serves desktop MCP/CLI access and WASM access through the Jet
+bridge. This document defines each repository's responsibility and records
+the implemented consumer checks below.
 
 ## Responsibility
 
@@ -45,12 +45,12 @@ not silently select a different node.
 
 ## Transport
 
-The planned native host opts into a local connection. Requests enter the
+The native host opts into a local connection. Requests enter the
 window event loop. UI state stays on its owning thread. A private session
 descriptor identifies the exact app and connection. The bridge must not
 discover or control unrelated user applications.
 
-The planned WASM adapter exposes a version/capability handshake and the
+The WASM adapter exposes a version/capability handshake and the
 same semantic operations. A separate global adapter should coexist with
 Jet's existing `window.__jet_debug` API. The Surface app must not imitate
 hook/fiber methods it does not implement.
@@ -58,14 +58,25 @@ hook/fiber methods it does not implement.
 Keep the transport schema small. Surface must not pull Chromium, the CLI
 or the MCP server into its application/renderer dependency graph.
 
-## Acceptance still required
+## Qualified paths
 
-- Standalone CLI and MCP serve real browser requests.
-- Existing Jet commands and consumer acceptance tests still pass.
-- A running native Surface window exports its real current tree through
-  CLI and MCP, then shows state changes from semantic actions.
-- A running Surface WASM app passes the same operations through the
-  extracted bridge, including Chinese controlled input and modal focus.
-- Imported MCP protocol compatibility is stated explicitly. The initial
-  server speaks the imported 2025-06-18 contract; the newer protocol must
-  not be claimed without its own conformance checks.
+| Path | Evidence |
+| --- | --- |
+| Browser CLI/MCP | Real Chromium fixture, Chinese DOM events, shared state, PNG and actual process exit; `scripts/live-browser.py` |
+| Jet consumer | [Jet #76](https://github.com/faberline/jet/pull/76) at `ffb1635803e96319529b82b0bceb8668b6846062`; actual local browser/MCP/debug-WASM journeys and preserved cross-module cases |
+| Surface native | [Surface #3](https://github.com/faberline/surface/pull/3) at `bcc31c92f0bf74ea75a25d57b04cfb8c9905906f`; macOS GPU window, real CLI/MCP snapshots and controlled actions |
+| Surface WASM | Same Surface revision; Chrome 157 WebGPU, same actions, PNG and actual browser exit |
+| MCP contract | Imported `2025-06-18`; official Python SDK initialize/list/error interoperability; 27 browser tools or seven semantic tools |
+
+Surface's `scripts/bridge-e2e.py` checks real controlled Chinese input,
+saved state, range snapping, disabled and removed nodes, modal scope,
+Tab loops and restored focus. Its native fixture also checks authentication,
+private Unix descriptor permissions and normal cleanup. It uses no
+Playwright runtime. Surface imports only the protocol crate at
+`a21f93425f8f27dfc7ab2bea0c34fdebcc71335f`.
+
+The hosted Jet parity workflow reports an unwired oracle and no results.
+Its successful exit does not qualify hosted parity. Other native operating
+systems, physical OS IME candidate windows, full Playwright parity and the
+newer MCP protocol need their own runtime/conformance checks. All linked
+changes remain draft PRs.

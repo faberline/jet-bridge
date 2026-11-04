@@ -48,10 +48,13 @@ fill events, clicks, shared CLI/MCP state, tool errors, PNG capture and
 actual browser exit after shutdown. It uses no Playwright runtime.
 
 Two cross-module tests remain in the Jet consumer. The initial extraction
-also passes Linux CI. Jet consumer cutover and the Surface adapters are
-still being verified.
+and protocol/client revision pass Linux CI. The
+[Jet consumer cutover](https://github.com/faberline/jet/pull/76) passes its
+local browser and WASM journeys. The
+[Surface adapters](https://github.com/faberline/surface/pull/3) pass actual
+macOS native and Chrome 157 WebGPU CLI/MCP journeys.
 See [the application bridge boundary](docs/application-bridge.md).
-No full Playwright replacement or native app acceptance is claimed.
+Full Playwright parity and other native platforms remain unqualified.
 
 ## Application protocol and clients
 
@@ -74,5 +77,7 @@ jet-bridge --root /path/to/project mcp --ui
 
 The UI MCP mode exposes seven semantic tools. The default MCP mode retains
 the 27 browser tools. These clients require an application adapter. The
-Surface adapters are a separate change; the commands above alone do not
-prove native or WASM runtime acceptance.
+Surface adapters live in the Surface repository. Their live checks cover
+current DOM/layout, controlled Chinese fill, saving/cancelling, range
+values, disabled/removed controls, modal focus, native session cleanup and
+actual browser exit. Physical OS IME input remains a separate consumer check.
